@@ -1,0 +1,24 @@
+import UsersPage from "./pages/UsersPage";
+//import EventsPage from "./pages/EventsPage";
+// import TopicsPage from "./pages/TopicsPage"; // если понадобится
+
+const routes = [
+  {
+    path: "/",
+    element: <UsersPage />,
+  },
+  {
+    path: "/users",
+    element: <UsersPage />,
+  }
+  // {
+  //   path: "/events",
+  //   element: <EventsPage />,
+  // },
+  // {
+  //   path: "/topics",
+  //   element: <TopicsPage />,
+  // },
+];
+
+export default routes;
