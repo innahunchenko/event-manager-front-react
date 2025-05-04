@@ -1,37 +1,18 @@
-.table-container {
-    margin-top: 20px;
-  }
-  
-  .button-group {
-    margin-bottom: 10px;
-  }
-  
-  .button-group button {
-    margin-right: 10px;
-  }
-  
-  .entity-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .entity-table th,
-  .entity-table td {
-    border: 1px solid #ccc;
-    padding: 8px;
-    text-align: left;
-  }
-  
-  .entity-table tr:hover {
-    background-color: #f2f2f2;
-    cursor: pointer;
-  }
-  
-  .selected-row {
-    background-color: #e0e0e0;
-  }
-  
-  .pagination {
-    margin-top: 15px;
-  }
-  
+.selected {
+  background-color: #e0f0ff;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+th {
+  background-color: #f4f4f4;
+}
+tr:hover {
+  background-color: #f9f9f9;
+  cursor: pointer;
+}

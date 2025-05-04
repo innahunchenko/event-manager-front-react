@@ -1,57 +1,149 @@
 import React, { useEffect, useState } from "react";
-import { apiFetch } from "../utils/api";
+import EntityTable from "../components/EntityTable";
+import UserForm from "../components/UserForm";
+import {
+  getAllUsers,
+  deleteUser,
+  createUser,
+  updateUser,
+} from "../services/userService";
 
-function UsersPage() {
+const columns = [
+  "First Name",
+  "Last Name",
+  "Position",
+  "Company",
+  "Years of Experience",
+  "Role",
+];
+
+const fieldNames = [
+  "firstName",
+  "lastName",
+  "position",
+  "company",
+  "yearsOfExperience",
+  "role",
+];
+
+const UsersPage = () => {
   const [users, setUsers] = useState([]);
+  const [selectedId, setSelectedId] = useState(null);
   const [error, setError] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    position: "",
+    company: "",
+    yearsOfExperience: 0,
+    role: "",
+  });
+
+  const loadUsers = async () => {
+    const data = await getAllUsers();
+    setUsers(data || []);
+  };
 
   useEffect(() => {
-    async function loadUsers() {
-      try {
-        const data = await apiFetch("/users");
-        setUsers(data || []);
-      } catch (err) {
-        console.error("API error:", err);
-        const title = err?.title || "Error";
-        const detail = err?.detail || "Something went wrong";
-        setError(`${title}: ${detail}`);
-      }
-    }
-
     loadUsers();
   }, []);
 
+  const handleDelete = async () => {
+    if (selectedId) {
+      const success = await deleteUser(selectedId);
+      if (success) {
+        setUsers((prev) => prev.filter((u) => u.id !== selectedId));
+        setSelectedId(null);
+      }
+    }
+  };
+
+  const handleSave = async () => {
+    const action = selectedId ? updateUser : createUser;
+
+    try {
+      const result = selectedId
+        ? await action(selectedId, formData)
+        : await action(formData);
+
+      if (result) {
+        setUsers((prev) =>
+          selectedId
+            ? prev.map((u) => (u.id === selectedId ? result : u))
+            : [...prev, result]
+        );
+      }
+
+      setShowModal(false);
+      resetForm();
+    } catch (err) {
+      setError(err.message || "Failed to save user");
+    }
+  };
+
+  const openEditModal = () => {
+    const user = users.find((u) => u.id === selectedId);
+    if (user) {
+      setFormData(user);
+      setShowModal(true);
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      firstName: "",
+      lastName: "",
+      position: "",
+      company: "",
+      yearsOfExperience: 0,
+      role: "",
+    });
+    setSelectedId(null);
+  };
+
   return (
     <div>
-      <h2>Users</h2>
-      {error ? (
-        <p style={{ color: "red" }}>{error}</p>
-      ) : (
-        <table border="1" cellPadding="8" style={{ borderCollapse: "collapse", width: "100%" }}>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Position</th>
-              <th>Company</th>
-              <th>Experience</th>
-              <th>Role</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((u) => (
-              <tr key={u.id}>
-                <td>{u.firstName} {u.lastName}</td>
-                <td>{u.position}</td>
-                <td>{u.company}</td>
-                <td>{u.yearsOfExperience}</td>
-                <td>{u.role}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <h1>Users</h1>
+
+      <div style={{ marginBottom: "1rem" }}>
+        <button
+          onClick={() => {
+            resetForm();
+            setShowModal(true);
+          }}
+        >
+          Create
+        </button>
+        <button onClick={openEditModal} disabled={!selectedId}>
+          Edit
+        </button>
+        <button onClick={handleDelete} disabled={!selectedId}>
+          Delete
+        </button>
+      </div>
+
+      <EntityTable
+        data={users}
+        fields={fieldNames}
+        columns={columns}
+        onSelect={setSelectedId}
+        selectedId={selectedId}
+      />
+
+      {showModal && (
+        <UserForm
+          formData={formData}
+          setFormData={setFormData}
+          onSave={handleSave}
+          onCancel={() => setShowModal(false)}
+          isEdit={!!selectedId}
+        />
       )}
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
-}
+};
 
 export default UsersPage;
