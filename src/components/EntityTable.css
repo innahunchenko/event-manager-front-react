@@ -1,18 +1,29 @@
-.selected {
-  background-color: #e0f0ff;
-}
 table {
   border-collapse: collapse;
   width: 100%;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  margin-top: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease;
 }
+
 th, td {
-  border: 1px solid #ccc;
-  padding: 8px;
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+  transition: background-color 0.2s ease;
 }
+
 th {
-  background-color: #f4f4f4;
+  font-weight: bold;
 }
+
 tr:hover {
-  background-color: #f9f9f9;
+  background-color: #f0f8ff;
   cursor: pointer;
+}
+
+tr.selected {
+  background-color: #cce5ff !important;
 }

@@ -1,13 +1,13 @@
 import React from "react";
 import "./EntityTable.css";
 
-export default function EntityTable({ data, columns, fields, selectedId, onSelect }) {
+export default function EntityTable({ data, columns, selectedId, onSelect }) {
   return (
     <table>
       <thead>
         <tr>
-          {columns.map((header, index) => (
-            <th key={index}>{header}</th>
+          {columns.map(({ label }) => (
+            <th key={label}>{label}</th>
           ))}
         </tr>
       </thead>
@@ -18,8 +18,10 @@ export default function EntityTable({ data, columns, fields, selectedId, onSelec
             className={item.id === selectedId ? "selected" : ""}
             onClick={() => onSelect?.(item.id)}
           >
-            {fields.map((field, idx) => (
-              <td key={idx}>{item[field]}</td>
+            {columns.map(({ name, render }) => (
+              <td key={name}>
+                {render ? render(item[name], item) : item[name]}
+              </td>
             ))}
           </tr>
         ))}

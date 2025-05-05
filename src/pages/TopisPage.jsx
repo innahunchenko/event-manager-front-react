@@ -1,29 +1,41 @@
 import React, { useEffect, useState } from "react";
 import EntityTable from "../components/EntityTable";
 import {
-  getAllUsers,
-  deleteUser,
-  createUser,
-  updateUser,
-} from "../services/userService";
+  getAllTopics,
+  deleteTopic,
+  createTopic,
+  updateTopic,
+} from "../services/topicService";
 import EntityForm from "../forms/EntityForm";
 
-const userFields = [
-  { name: "firstName", label: "First Name", type: "text" },
-  { name: "lastName", label: "Last Name", type: "text" },
-  { name: "position", label: "Position", type: "text" },
-  { name: "company", label: "Company", type: "text" },
-  { name: "yearsOfExperience", label: "Years of Experience", type: "number" },
-  { name: "role", label: "Role", type: "text" },
+const topicFields = [
+  { name: "name", label: "Name", type: "text" },
+  { name: "description", label: "Description", type: "text" },
+  {
+    name: "isActive",
+    label: "Activity",
+    type: "boolean",
+    render: (value) =>
+      value === true || value === "true" ? "Active" : "Inactive",
+  }  
 ];
 
-const initialFormState = userFields.reduce((acc, field) => {
-  acc[field.name] = field.type === "number" ? 0 : "";
+const initialFormState = topicFields.reduce((acc, field) => {
+  switch (field.type) {
+    case "number":
+      acc[field.name] = 0;
+      break;
+    case "boolean":
+      acc[field.name] = false;
+      break;
+    default:
+      acc[field.name] = "";
+  }
   return acc;
 }, {});
 
-const UsersPage = () => {
-  const [users, setUsers] = useState([]);
+const TopicsPage = () => {
+  const [topics, setTopics] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -32,48 +44,44 @@ const UsersPage = () => {
 
   useEffect(() => {
     (async () => {
-      const data = await getAllUsers();
-      setUsers(data || []);
+      const data = await getAllTopics();
+      setTopics(data || []);
     })();
   }, []);
 
   const handleDelete = async () => {
     if (!selectedId) return;
 
-    const success = await deleteUser(selectedId);
+    const success = await deleteTopic(selectedId);
     if (success) {
-      setUsers((prev) => prev.filter((u) => u.id !== selectedId));
+      setTopics((prev) => prev.filter((t) => t.id !== selectedId));
       setSelectedId(null);
     }
   };
 
   const handleSave = async () => {
-    const action = formMode === "edit" ? updateUser : createUser;
+    const action = formMode === "edit" ? updateTopic : createTopic;
     const args = formMode === "edit" ? [selectedId, formData] : [formData];
 
     try {
       const result = await action(...args);
 
-      setUsers((prev) =>
+      setTopics((prev) =>
         formMode === "edit"
-          ? prev.map((u) => (u.id === selectedId ? result : u))
+          ? prev.map((t) => (t.id === selectedId ? result : t))
           : [...prev, result]
       );
 
       closeModal();
     } catch (err) {
-      setError(err.message || "Failed to save user");
+      setError(err.message || "Failed to save topic");
     }
   };
 
   const openModal = (mode) => {
-    const user = users.find((u) => u.id === selectedId);
-    if (mode === "create") {
-      setFormData(initialFormState);
-    } else if (user) {
-      setFormData(user);
-    }
+    const topic = topics.find((t) => t.id === selectedId);
     setFormMode(mode);
+    setFormData(mode === "create" ? initialFormState : topic || initialFormState);
     setShowModal(true);
   };
 
@@ -85,7 +93,7 @@ const UsersPage = () => {
 
   return (
     <div>
-      <h1>Users</h1>
+      <h1>Topics</h1>
 
       <div>
         <button onClick={() => openModal("create")}>Create</button>
@@ -101,16 +109,16 @@ const UsersPage = () => {
       </div>
 
       <EntityTable
-        data={users}
-        columns={userFields}
+        data={topics}
+        columns={topicFields}
         selectedId={selectedId}
         onSelect={setSelectedId}
       />
 
       {showModal && (
         <EntityForm
-          entityName="user"
-          fields={userFields}
+          entityName="topic"
+          fields={topicFields}
           formData={formData}
           setFormData={setFormData}
           onSave={handleSave}
@@ -124,4 +132,4 @@ const UsersPage = () => {
   );
 };
 
-export default UsersPage;
+export default TopicsPage;

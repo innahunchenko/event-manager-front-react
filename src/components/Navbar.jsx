@@ -6,7 +6,7 @@ export default function Navbar() {
     <nav className="navbar">
       <Link to="/users" className="nav-link">Users</Link>
       {/* <Link to="/events" className="nav-link">Events</Link> */}
-      {/* <Link to="/topics" className="nav-link">Topics</Link> */}
+      {<Link to="/topics" className="nav-link">Topics</Link>}
     </nav>
   );
 }

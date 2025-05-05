@@ -1,38 +1,16 @@
-import { apiFetch } from "./apiClient";
+import { createCrudClient, apiRequest } from "./apiClient";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const userClient = createCrudClient("users");
 
-export async function getAllUsers() {
-  return await apiFetch(`/users`);
-}
-
-export async function createUser(user) {
-  return await apiFetch(`/users/create`, {
-    method: "POST",
-    body: JSON.stringify(user),
-  });
-}
-
-export async function updateUser(id, patch) {
-  return await apiFetch(`/users/${id}`, {
-    method: "PATCH",
-    body: JSON.stringify(patch),
-  });
-}
-
-export async function deleteUser(id) {
-  return await apiFetch(`/users/${id}`, {
-    method: "DELETE",
-  });
-}
+export const getAllUsers = userClient.getAll;
+export const createUser = userClient.create;
+export const updateUser = userClient.update;
+export const deleteUser = userClient.delete;
 
 export async function assignEventsToUser(id, eventIds) {
-  return await apiFetch(`/users/assign-events/${id}`, {
-    method: "POST",
-    body: JSON.stringify({ eventIds }),
-  });
+  return await apiRequest(`users/assign-events/${id}`, "POST", eventIds);
 }
 
 export async function getUserEvents(id) {
-  return await apiFetch(`/users/events/${id}`);
+  return await apiRequest(`users/events/${id}`, "GET");
 }
